@@ -1,0 +1,10 @@
+[database]
+base = mysql
+host = frp-hen.top
+port = 24176
+user = root
+password = Metasurface331.
+database = mcb_test
+
+
+[server]
