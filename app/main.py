@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 from app.db import get_db_connection
+from app.units import get_shapeInfo
 
 
 app = FastAPI()
@@ -44,7 +45,8 @@ class queryRequest(BaseModel):
 @app.post("/query/api/")
 def query_api(request: queryRequest):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    shapeInfo = get_shapeInfo(conn)
+    print(shapeInfo)
     for shape in request.shapeSet:
         # print(f"Shape: {shape.id}, {shape.name}")
         for generic in request.genericSet:

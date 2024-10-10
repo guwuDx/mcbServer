@@ -47,6 +47,5 @@ def get_shapeInfo(conn):
             "id": row[0],
             "name": row[1]
         })
-        
 
     return shapeInfo
