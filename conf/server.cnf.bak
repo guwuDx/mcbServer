@@ -1,10 +1,12 @@
 [database]
 base = mysql
-host = frp-hen.top
-port = 24176
+host = 127.0.0.1
+port = 3306
 user = root
-password = Metasurface331.
-database = mcb_test
+password = 123456
+database = metasurface_demo_db
+charset = utf8mb4
+collation = utf8mb4_general_ci
 
 
 [server]

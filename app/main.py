@@ -46,10 +46,9 @@ class queryRequest(BaseModel):
 def query_api(request: queryRequest):
     conn = get_db_connection()
     shapeInfo = get_shapeInfo(conn)
-    print(shapeInfo)
     for shape in request.shapeSet:
         # print(f"Shape: {shape.id}, {shape.name}")
-        print(shapeInfo[shape.id].colnames)
+        # print(shapeInfo[shape.id]['colnames'][0])
         for generic in request.genericSet:
             print(f"Generic: {generic.parameter}, {generic.value}")
             pass
