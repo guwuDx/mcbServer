@@ -1,5 +1,6 @@
 import configparser
 import os
+import ast
 
 def get_cnf(filename, section):
     """
@@ -45,7 +46,8 @@ def get_shapeInfo(conn):
     for row in rows:
         shapeInfo.append({
             "id": row[0],
-            "name": row[1]
+            "name": row[1],
+            "colnames": ast.literal_eval(row[5])
         })
 
     return shapeInfo

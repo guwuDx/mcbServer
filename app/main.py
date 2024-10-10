@@ -49,6 +49,7 @@ def query_api(request: queryRequest):
     print(shapeInfo)
     for shape in request.shapeSet:
         # print(f"Shape: {shape.id}, {shape.name}")
+        print(shapeInfo[shape.id].colnames)
         for generic in request.genericSet:
             print(f"Generic: {generic.parameter}, {generic.value}")
             pass
