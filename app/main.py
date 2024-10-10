@@ -45,13 +45,12 @@ class queryRequest(BaseModel):
 def query_api(request: queryRequest):
     for shape in request.shapeSet:
         print(f"Shape: {shape.id}, {shape.name}")
-        pass
-    for generic in request.genericSet:
-        print(f"Generic: {generic.parameter}, {generic.value}")
-        pass
-    for freq in request.freqSet:
-        print(f"Freq: {freq.parameter}, {freq.value}")
-        pass
+        for generic in request.genericSet:
+            print(f"Generic: {generic.parameter}, {generic.value}")
+            pass
+        for freq in request.freqSet:
+            print(f"Freq: {freq.parameter}, {freq.value}")
+            pass
 
     conn = get_db_connection()
     cursor = conn.cursor()
