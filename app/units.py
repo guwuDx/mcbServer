@@ -36,3 +36,16 @@ def get_shapeInfo(conn):
     :param conn: the database connection
     :return: a Object containing the shape information
     """
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM ShapeDef")
+    rows = cursor.fetchall()
+
+    shapeInfo = []
+    for row in rows:
+        shapeInfo.append({
+            "id": row[0],
+            "name": row[1]
+        })
+
+    return shapeInfo
