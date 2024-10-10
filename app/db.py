@@ -14,5 +14,7 @@ def get_db_connection():
         port=db_config["port"],
         user=db_config["user"],
         password=db_config["password"],
-        database=db_config["database"]
+        database=db_config["database"],
+        charset=db_config["charset"],
+        collation=db_config["collation"]
     )

@@ -1,10 +1,12 @@
 [database]
 base = mysql
-host = localhost
+host = 127.0.0.1
 port = 3306
 user = root
 password = 123456
 database = metasurface_demo_db
+charset = utf8mb4
+collation = utf8mb4_general_ci
 
 
 [server]
