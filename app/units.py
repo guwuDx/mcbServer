@@ -27,3 +27,12 @@ def get_cnf(filename, section):
         raise Exception(f"Section '{section}' not found in the {filename} file")
 
     return config
+
+
+def get_shapeInfo(conn):
+    """
+    Get the shape information from the database
+
+    :param conn: the database connection
+    :return: a Object containing the shape information
+    """

@@ -43,8 +43,10 @@ class queryRequest(BaseModel):
 
 @app.post("/query/api/")
 def query_api(request: queryRequest):
+    conn = get_db_connection()
+    cursor = conn.cursor()
     for shape in request.shapeSet:
-        print(f"Shape: {shape.id}, {shape.name}")
+        # print(f"Shape: {shape.id}, {shape.name}")
         for generic in request.genericSet:
             print(f"Generic: {generic.parameter}, {generic.value}")
             pass
@@ -52,5 +54,3 @@ def query_api(request: queryRequest):
             print(f"Freq: {freq.parameter}, {freq.value}")
             pass
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
