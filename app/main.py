@@ -46,13 +46,22 @@ class queryRequest(BaseModel):
 def query_api(request: queryRequest):
     conn = get_db_connection()
     shapeInfo = get_shapeInfo(conn)
+    sql = [["" for _ in range(3)] for _ in range(shapeInfo.__len__())]
     for shape in request.shapeSet:
-        # print(f"Shape: {shape.id}, {shape.name}")
-        # print(shapeInfo[shape.id]['colnames'][0])
+
+        # generate the SQL header (referance to the shape table)
+        sql[shape.id] = f"SELECT {shapeInfo[0]['colnames'][0]}.*, " \
+                               f"{shapeInfo[shape.id]['colnames'][0]}.*, " \
+                               f"{shapeInfo[shape.id]['colnames'][1]}.*\n"
+        sql[shape.id] += f"FROM {shapeInfo[0]['colnames'][0]}\n"
+        sql[shape.id] += f"JOIN {shapeInfo[shape.id]['colnames'][0]} " \
+                           f"ON {shapeInfo[shape.id]['colnames'][0]}.gup_id = {shapeInfo[0]['colnames'][0]}.id\n"
+
+        print(sql[shape.id])
         for generic in request.genericSet:
-            print(f"Generic: {generic.parameter}, {generic.value}")
+            # print(f"Generic: {generic.parameter}, {generic.value}")
             pass
         for freq in request.freqSet:
-            print(f"Freq: {freq.parameter}, {freq.value}")
+            # print(f"Freq: {freq.parameter}, {freq.value}")
             pass
 

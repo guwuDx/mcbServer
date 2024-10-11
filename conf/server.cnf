@@ -8,5 +8,9 @@ database = mcb_test
 charset = utf8mb4
 collation = utf8mb4_general_ci
 
+[constants]
+c = 2.99792458e8
+N_MIR = 119.9170
+M_FIR = 59.9585
 
 [server]
