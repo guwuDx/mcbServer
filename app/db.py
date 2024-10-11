@@ -1,6 +1,7 @@
 import mysql.connector
 from app.units import get_cnf
 
+
 def get_db_connection():
     db_config = get_cnf("conf/server.cnf", "database")
 
@@ -19,16 +20,22 @@ def get_db_connection():
         collation=db_config["collation"]
     )
 
+
 def query_header_gen(shape, shapeInfo):
-    sql_header = f"SELECT {shapeInfo[0]['colnames'][0]}.*, " \
-                 f"{shapeInfo[shape.id]['colnames'][0]}.*, " \
-                 f"{shapeInfo[shape.id]['colnames'][1]}.*\n"
-    sql_header += f"FROM {shapeInfo[0]['colnames'][0]}\n"
-    sql_header += f"JOIN {shapeInfo[shape.id]['colnames'][0]} " \
-                  f"ON {shapeInfo[shape.id]['colnames'][0]}.gup_id = {shapeInfo[0]['colnames'][0]}.id\n"
+
+    gen_table = shapeInfo[0]['colnames'][0]
+    target_shape = shapeInfo[shape.id]['colnames']
+
+    sql_header = f"SELECT {gen_table}.*, " \
+                 f"{target_shape[0]}.*, " \
+                 f"{target_shape[1]}.*\n"
+    sql_header += f"FROM {gen_table}\n"
+    sql_header += f"JOIN {target_shape[0]} " \
+                  f"ON {target_shape[0]}.gup_id = {gen_table}.id\n"
 
     return sql_header
 
-def query_freq_gen(freq):
+
+def query_freq_gen(freqSet, target_table):
     sql_pt_freq = ""
     return sql_pt_freq
