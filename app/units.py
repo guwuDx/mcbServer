@@ -53,16 +53,18 @@ def get_shapeInfo(conn):
     return shapeInfo
 
 
-def freq_pattern_parse(freqSet):
+def freq_expression_parse(freqSet):
     """
     Parse the frequency from the frequency setting logic 
     into the actual frequency range, 
     which will be represented as [NIR, MIR, FIR]
+
+    :param freqSet: the frequency setting logic
+    :return: the frequency range
     """
 
     terms = []
     crr_term_intervals = []
-    N_M_F = [0, 0, 0]   # 1: query 0: not query
 
     for item in freqSet:
         if item['parameter'] == 3:
@@ -75,11 +77,37 @@ def freq_pattern_parse(freqSet):
 
             interval = get_interval(rangeMode, val, isInvert, rangeStart, rangeEnd)
 
-    return N_M_F
+            if logic == 1: # AND
+                if not crr_term_intervals:
+                    crr_term_intervals = interval
+                else:
+                    crr_term_intervals = intersect_intervals(crr_term_intervals, interval)
+            elif logic == 2: # OR
+                if crr_term_intervals:
+                    terms.append(crr_term_intervals)
+                crr_term_intervals = interval
+
+    if crr_term_intervals:
+        terms.append(crr_term_intervals)
+
+    # Union all terms
+    result_intervals = []
+    for term in terms:
+        result_intervals = union_intervals(result_intervals, term)
+
+    return result_intervals
 
 
 def get_interval(rangeMode, val, isInvert, rangeStart, rangeEnd):
     """
+    Get the interval of the frequency range
+
+    :param rangeMode: the mode of the range
+    :param val: the value of the range (only for mode 1, 2, 3)
+    :param isInvert: whether the range is inverted
+    :param rangeStart: the start of the range (only for mode 4)
+    :param rangeEnd: the end of the range (only for mode 4)
+    :return: the interval of the range
     """
 
     if isInvert:
@@ -100,3 +128,86 @@ def get_interval(rangeMode, val, isInvert, rangeStart, rangeEnd):
             return [(0, val)]
         elif rangeMode == 4: # x BETWEEN rangeStart AND rangeEnd
             return [(rangeStart, rangeEnd)]
+
+
+def intersect_intervals(interval1, interval2):
+    """
+    Intersect two intervals
+
+    :param interval1: the first interval
+    :param interval2: the second interval
+    :return: the intersected interval
+    """
+
+    result = []
+    for start1, end1 in interval1:
+        for start2, end2 in interval2:
+            start = max(start1, start2)
+            end = min(end1, end2)
+            if start < end:
+                result.append((start, end))
+            elif start == end: 
+                # If intervals are singal points
+                if start == start1 == end1 == start2 == end2:
+                    result.append((start, end))
+    return result
+
+
+def union_intervals(interval1, interval2):
+    """
+    Union two intervals
+
+    :param interval1: the first interval
+    :param interval2: the second interval
+    :return: the unioned interval
+    """
+
+    intervals = interval1 + interval2
+    intervals.sort()
+    merged = []
+    for interval in intervals:
+        if not merged: # First interval
+            merged.append(interval)
+        else:
+            prev_start, prev_end = merged[-1]
+            curr_start, curr_end = interval
+            if prev_end >= curr_start: # Merge overlapping intervals
+                merged[-1] = (prev_start, max(prev_end, curr_end))
+            else:
+                merged.append(interval)
+    return merged
+
+
+def N_M_F_judge(result_intervals):
+    """
+    Judge the frequency range is NIR, MIR or FIR
+
+    :param result_intervals: the frequency range
+    :return: the type of the frequency range
+    """
+
+    constants = get_cnf("conf/server.cnf", "constants")
+    N_MIR = constants.get("N_MIR", 119.9170)
+    M_FIR = constants.get("M_FIR", 59.9585)
+    N_M_F = [0, 0, 0]
+
+    for start, end in result_intervals:
+        if start < M_FIR: # Overlapping with NIR: [0, M_FIR]
+            N_M_F[0] = 1
+        if start < N_MIR < end: # Overlapping with MIR: [N_MIR, M_FIR]
+            N_M_F[1] = 1
+        if end > N_MIR: # Overlapping with FIR: [N_MIR, inf)
+            N_M_F[2] = 1
+    return N_M_F
+
+
+def freq_range_parse(freqSet):
+    """
+    Parse the frequency from the frequency setting logic
+    into the actual frequency range
+
+    :param freqSet: the frequency setting logic
+    :return: the frequency range
+    """
+
+    return N_M_F_judge(freq_expression_parse(freqSet))
