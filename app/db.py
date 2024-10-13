@@ -43,50 +43,62 @@ def query_header_gen(shape, shapeInfo):
     return sql_header
 
 
-def query_generic_gen(genericSet, freqSet):
+def query_generic_gen(genericSet):
     sql_pt_generic = ""
 
     for generic in genericSet:
         if sql_pt_generic:
-            if generic['logic'] == 1:
+            if generic.logic == 1:
                 sql_pt_generic += "AND "
-            elif generic['logic'] == 2:
+            elif generic.logic == 2:
                 sql_pt_generic += "OR "
 
-        if generic['isInvert']:
+        if generic.isInvert:
             sql_pt_generic += "NOT "
 
-        if 1 <= generic['parameter'] <= 2:
-            if generic['parameter'] == 1:
-                sql_pt_generic += f"cellMaterial_id = {generic['selectedMaterial']}\n"
-            elif generic['parameter'] == 2:
-                sql_pt_generic += f"baseMaterial_id = {generic['selectedMaterial']}\n"
-
-        elif 3 <= generic['parameter'] <= 5:
-            if generic['parameter'] == 3:
+        if generic.parameter == 1:
+            sql_pt_generic += f"cellMaterial_id = {generic.selectedMaterial}\n"
+        elif generic.parameter == 2:
+            sql_pt_generic += f"baseMaterial_id = {generic.selectedMaterial}\n"
+        elif 3 <= generic.parameter <= 5:
+            if generic.parameter == 3:
                 sql_pt_generic += "period "
-            elif generic['parameter'] == 4:
+            elif generic.parameter == 4:
                 sql_pt_generic += "height "
-            elif generic['parameter'] == 5:
+            elif generic.parameter == 5:
                 sql_pt_generic += "thickness "
 
-            if generic['rangeMode'] == 1:
-                sql_pt_generic += f"= {generic['value']}\n"
-            elif generic['rangeMode'] == 2:
-                sql_pt_generic += f">= {generic['value']}\n"
-            elif generic['rangeMode'] == 3:
-                sql_pt_generic += f"<= {generic['value']}\n"
-            elif generic['rangeMode'] == 4:
-                if generic['rangeStart'] == generic['rangeEnd']:
-                    sql_pt_generic += f"= {generic['rangeStart']}\n"
-                elif generic['rangeStart'] > generic['rangeEnd']:
-                    sql_pt_generic += f"BETWEEN {generic['rangeEnd']} AND {generic['rangeStart']}\n"
+            if generic.rangeMode == 1:
+                sql_pt_generic += f"= {generic.value}\n"
+            elif generic.rangeMode == 2:
+                sql_pt_generic += f">= {generic.value}\n"
+            elif generic.rangeMode == 3:
+                sql_pt_generic += f"<= {generic.value}\n"
+            elif generic.rangeMode == 4:
+                if generic.rangeStart == generic.rangeEnd:
+                    sql_pt_generic += f"= {generic.rangeStart}\n"
+                elif generic.rangeStart > generic.rangeEnd:
+                    sql_pt_generic += f"BETWEEN {generic.rangeEnd} AND {generic.rangeStart}\n"
                 else:
-                    sql_pt_generic += f"BETWEEN {generic['rangeStart']} AND {generic['rangeEnd']}\n"
+                    sql_pt_generic += f"BETWEEN {generic.rangeStart} AND {generic.rangeEnd}\n"
 
     return sql_pt_generic
 
 
 def query_freq_gen(freqSet, target_table):
     sql_pt_freq = ""
+
+    for freq in freqSet:
+        if sql_pt_freq:
+            if freq.logic == 1:
+                sql_pt_freq += "AND "
+            elif freq.logic == 2:
+                sql_pt_freq += "OR "
+
+        if freq.isInvert:
+            sql_pt_freq += "NOT "
+
+        if freq.parameter == 1:
+            sql_pt_freq
+
     return sql_pt_freq

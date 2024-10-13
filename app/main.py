@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 from app.db import get_db_connection
+from app.db import query_generic_gen
 from app.units import get_shapeInfo
 
 
@@ -48,15 +49,8 @@ def query_api(request: queryRequest):
     shapeInfo = get_shapeInfo(conn)
     sql = [["" for _ in range(3)] for _ in range(shapeInfo.__len__())]
     for shape in request.shapeSet:
-
-        # generate the SQL header (referance to the shape table)
-        sql[shape.id] = f"SELECT {shapeInfo[0]['colnames'][0]}.*, " \
-                               f"{shapeInfo[shape.id]['colnames'][0]}.*, " \
-                               f"{shapeInfo[shape.id]['colnames'][1]}.*\n"
-        sql[shape.id] += f"FROM {shapeInfo[0]['colnames'][0]}\n"
-        sql[shape.id] += f"JOIN {shapeInfo[shape.id]['colnames'][0]} " \
-                           f"ON {shapeInfo[shape.id]['colnames'][0]}.gup_id = {shapeInfo[0]['colnames'][0]}.id\n"
-
+        sql_pt_generic = query_generic_gen(request.genericSet)
+        print(sql_pt_generic)
         print(sql[shape.id])
         for generic in request.genericSet:
             # print(f"Generic: {generic.parameter}, {generic.value}")
@@ -64,4 +58,6 @@ def query_api(request: queryRequest):
         for freq in request.freqSet:
             # print(f"Freq: {freq.parameter}, {freq.value}")
             pass
+
+    return {"message": "OK"}
 
