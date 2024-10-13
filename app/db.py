@@ -99,6 +99,6 @@ def query_freq_gen(freqSet, target_table):
             sql_pt_freq += "NOT "
 
         if freq.parameter == 1:
-            sql_pt_freq
+            sql_pt_freq += f""
 
     return sql_pt_freq
