@@ -2,8 +2,8 @@
 base = mysql
 host = frp-hen.top
 port = 24176
-user = root
-password = Metasurface331.
+user = query
+password = passw0rd
 database = mcb_test
 charset = utf8mb4
 collation = utf8mb4_general_ci
