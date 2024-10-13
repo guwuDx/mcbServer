@@ -36,6 +36,11 @@ def query_header_gen(shape, shapeInfo):
     return sql_header
 
 
+def query_generic_gen(genericSet):
+    sql_pt_generic = ""
+    return sql_pt_generic
+
+
 def query_freq_gen(freqSet, target_table):
     sql_pt_freq = ""
     return sql_pt_freq
