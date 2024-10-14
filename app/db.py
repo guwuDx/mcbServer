@@ -126,12 +126,37 @@ def query_freq_gen(freqSet, freq_table):
 
 
 def query_cat(sql_pt_generic, sql_pt_freq, gen_table, shape_param_table, freq_table):
-    sql_expr = "SELECT g.*, s.*, f.*\n FROM (\n"
-    sql_expr += f"  SELECT * \n"
-    sql_expr += f"  FROM {gen_table}\n"
-    sql_expr += f"  WHERE {sql_pt_generic}) g\n"
+    sql_expr = "SELECT g.*, s.*, f.*\nFROM "
+    if sql_pt_generic:
+        sql_expr += f"(\n"
+        sql_expr += f"  SELECT * \n"
+        sql_expr += f"  FROM {gen_table}\n"
+        sql_expr += f"  WHERE {sql_pt_generic}) g\n"
+    else: # No generic filter
+        sql_expr += f"{gen_table} g\n"
+
     sql_expr += f"JOIN {shape_param_table} s ON s.gup_id = g.id\n"
     sql_expr += f"JOIN {freq_table} f ON f.up_id = s.id\n"
-    sql_expr += f"WHERE {sql_pt_freq};\n"
+
+    if sql_pt_freq:
+        sql_expr += f"WHERE {sql_pt_freq};\n"
+    else: # No frequency filter
+        sql_expr += f";\n"
 
     return sql_expr
+
+
+def query_exec(conn, sql):
+    """
+    Execute the query
+
+    :param conn: the database connection
+    :param sql: the query
+    :return: the result of the query
+    """
+
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+
+    return rows
