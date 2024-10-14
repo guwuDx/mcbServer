@@ -5,6 +5,8 @@ from typing import List, Optional
 
 from app.db import get_db_connection
 from app.db import query_generic_gen
+from app.db import query_freq_gen
+from app.db import query_cat
 from app.units import get_shapeInfo
 
 
@@ -49,9 +51,13 @@ def query_api(request: queryRequest):
     shapeInfo = get_shapeInfo(conn)
     sql = [["" for _ in range(3)] for _ in range(shapeInfo.__len__())]
     for shape in request.shapeSet:
+        generic_table = shapeInfo[0]['colnames'][0]
+        shape_tables = shapeInfo[shape.id]['colnames']
+
         sql_pt_generic = query_generic_gen(request.genericSet)
-        print(sql_pt_generic)
-        print(sql[shape.id])
+        sql_pt_freq = query_freq_gen(request.freqSet, shape_tables[1]+"_nir")
+        print(query_cat(sql_pt_generic, sql_pt_freq, generic_table, shape_tables[0], shape_tables[1]+"_nir"))
+        print("\n")
         for generic in request.genericSet:
             # print(f"Generic: {generic.parameter}, {generic.value}")
             pass
