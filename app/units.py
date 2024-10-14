@@ -67,13 +67,13 @@ def freq_expression_parse(freqSet):
     crr_term_intervals = []
 
     for item in freqSet:
-        if item['parameter'] == 3:
-            logic       = item['logic']
-            isInvert    = item['isInvert']
-            rangeEnd    = item['rangeEnd']
-            rangeMode   = item['rangeMode']
-            rangeStart  = item['rangeStart']
-            val         = item['value']
+        if item.parameter == 3:
+            logic       = item.logic
+            isInvert    = item.isInvert
+            rangeEnd    = item.rangeEnd
+            rangeMode   = item.rangeMode
+            rangeStart  = item.rangeStart
+            val         = item.value
 
             interval = get_interval(rangeMode, val, isInvert, rangeStart, rangeEnd)
 
