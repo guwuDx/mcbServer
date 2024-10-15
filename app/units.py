@@ -227,6 +227,7 @@ def result_text_gen(query_result, shapeInfo, sql, fileName):
     :param shapeInfo: the shape information
     :param sql: the SQL query array
     :param fileName: the name of the result file
+    :return: the path of the result file
     """
 
     # check the sql witch is not empty
@@ -239,12 +240,11 @@ def result_text_gen(query_result, shapeInfo, sql, fileName):
                 for line in raw_sql.strip().split('\n'):
                     line = line.lstrip()
                     if line.startswith(('AND', 'OR', 'WHERE')):
-                        line = re.sub(r'(?<= )[a-z]*\.', '', line, count=1).replace('WHERE', ' 1&& ')
+                        line = re.sub(r'(?<= )[a-z]*\.', '', line, count=1).replace('WHERE', '&& ')
                         text_head.append(line)
 
-                text_head = '# ' + '    '.join(text_head)
+                text_head = '# ' + '\n#\t'.join(text_head)
 
-                print(text_head)
                 break_flag = True
                 break
         if break_flag:
@@ -256,5 +256,13 @@ def result_text_gen(query_result, shapeInfo, sql, fileName):
     if not os.path.exists(result_dir):
         os.makedirs(result_dir)
     result_path = result_dir + fileName
+
     with open(result_path, "a") as f:
-        pass
+        f.write(text_head)
+        f.write('\n\n')
+        for i, shape in enumerate(shapeInfo):
+            f.write(f"[{shape['name']}]\n")
+            np.savetxt(f, query_result[i], fmt='%s', delimiter='\t')
+            f.write('\n\n')
+
+    return result_path

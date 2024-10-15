@@ -59,7 +59,7 @@ def query_api(request: queryRequest):
     fid = (hashlib.sha256(request.model_dump_json().encode('utf-8')))
     fid = fid.hexdigest()
     now = datetime.now()
-    fileName = f"{now.strftime('%Y%m%d%H%M%S')}-{fid}.txt"
+    fileName = f"{fid}{now.strftime('%Y%m%d%H%M%S')}.txt"
 
     N_M_F = freq_range_parse(request.freqSet)
     freqRange = ["_nir", "_mir", "_fir"]
@@ -95,7 +95,7 @@ def query_api(request: queryRequest):
 
     conn.close()
 
-    result_text_gen(query_result, shapeInfo, sql, fileName)
+    delivered_file = result_text_gen(query_result, shapeInfo, sql, fileName)
 
-    return {"message": "OK"}
+    return {"message": "[OK][mcbq] Query was successful", "file": delivered_file}
 
