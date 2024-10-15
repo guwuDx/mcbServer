@@ -74,9 +74,9 @@ def query_api(request: queryRequest):
                 if query_result[shape.id][j]: # Remove the id, foreign key, hash columns
                     query_result[shape.id][j] = np.delete(query_result[shape.id][j], [0, 8, 9, 6+paramNum, 7+paramNum, 12+paramNum], axis=1)
                 else:
-                    print(f"Not any result of {shape.name} in {freqRange[j]}")
+                    print(f"No data was found in {shape.name} about the range of {freqRange[j]}")
             else:
-                print(f"No data was requested for {shape.name} in {freqRange[j]}")
+                print(f"No data was requested for {shape.name} about {freqRange[j]}")
 
     print(query_result[3][2])
     conn.close()

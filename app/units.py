@@ -51,6 +51,7 @@ def get_shapeInfo(conn):
             "colnames": ast.literal_eval(row[5])
         })
 
+    cursor.close()
     return shapeInfo
 
 

@@ -159,4 +159,5 @@ def query_exec(conn, sql):
     cursor.execute(sql)
     rows = cursor.fetchall()
 
+    cursor.close()
     return rows
