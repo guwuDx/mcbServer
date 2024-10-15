@@ -61,15 +61,24 @@ def query_api(request: queryRequest):
     query_result = [[[] for _ in range(3)] for _ in range(shapeInfo.__len__())]
 
     for shape in request.shapeSet:
+        sql_pt_generic = query_generic_gen(request.genericSet)
         generic_table = shapeInfo[0]['colnames'][0]
         shape_tables = shapeInfo[shape.id]['colnames']
-        sql_pt_generic = query_generic_gen(request.genericSet)
+        paramNum = shapeInfo[shape.id]['paramNum']
 
         for j in range(3):
             if N_M_F[j]:
                 sql_pt_freq = query_freq_gen(request.freqSet, shape_tables[1]+freqRange[j])
                 sql[shape.id][j] = query_cat(sql_pt_generic, sql_pt_freq, generic_table, shape_tables[0], shape_tables[1]+freqRange[j])
                 query_result[shape.id][j] = query_exec(conn, sql[shape.id][j])
+                if query_result[shape.id][j]: # Remove the id, foreign key, hash columns
+                    query_result[shape.id][j] = np.delete(query_result[shape.id][j], [0, 8, 9, 6+paramNum, 7+paramNum, 12+paramNum], axis=1)
+                else:
+                    print(f"Not any result of {shape.name} in {freqRange[j]}")
+            else:
+                print(f"No data was requested for {shape.name} in {freqRange[j]}")
 
+    print(query_result[3][0][0])
+    conn.close()
     return {"message": "OK"}
 

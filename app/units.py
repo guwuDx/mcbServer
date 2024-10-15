@@ -47,6 +47,7 @@ def get_shapeInfo(conn):
         shapeInfo.append({
             "id": row[0],
             "name": row[1],
+            "paramNum": row[3],
             "colnames": ast.literal_eval(row[5])
         })
 
