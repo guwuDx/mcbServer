@@ -59,7 +59,7 @@ def query_api(request: queryRequest):
     fid = (hashlib.sha256(request.model_dump_json().encode('utf-8')))
     fid = fid.hexdigest()
     now = datetime.now()
-    fileName = f"{now.strftime('%Y%m%d%H%M%S')}-{fid}.csv"
+    fileName = f"{now.strftime('%Y%m%d%H%M%S')}-{fid}.txt"
 
     N_M_F = freq_range_parse(request.freqSet)
     freqRange = ["_nir", "_mir", "_fir"]

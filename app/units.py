@@ -239,7 +239,7 @@ def result_text_gen(query_result, shapeInfo, sql, fileName):
                 for line in raw_sql.strip().split('\n'):
                     line = line.lstrip()
                     if line.startswith(('AND', 'OR', 'WHERE')):
-                        line = re.sub(r'(?<= )[a-z]*\.', '', line, count=1).replace('WHERE', '')
+                        line = re.sub(r'(?<= )[a-z]*\.', '', line, count=1).replace('WHERE', ' 1&& ')
                         text_head.append(line)
 
                 text_head = '# ' + '    '.join(text_head)
@@ -250,6 +250,11 @@ def result_text_gen(query_result, shapeInfo, sql, fileName):
         if break_flag:
             break
 
-    result_path = get_cnf("conf/server.cnf", "server")["result_path"] + fileName
+    result_dir = get_cnf("conf/server.cnf", "server")["result_path"]
+    if result_dir[-1] != '/' or result_dir[-1] != '\\':
+        result_dir += '/'
+    if not os.path.exists(result_dir):
+        os.makedirs(result_dir)
+    result_path = result_dir + fileName
     with open(result_path, "a") as f:
         pass
