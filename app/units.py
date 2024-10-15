@@ -1,4 +1,7 @@
+import numpy as np
+
 import configparser
+import re
 import os
 import ast
 
@@ -48,7 +51,8 @@ def get_shapeInfo(conn):
             "id": row[0],
             "name": row[1],
             "paramNum": row[3],
-            "colnames": ast.literal_eval(row[5])
+            "columns": ast.literal_eval(row[4]),
+            "tables": ast.literal_eval(row[5])
         })
 
     cursor.close()
@@ -213,3 +217,39 @@ def freq_range_parse(freqSet):
     """
 
     return N_M_F_judge(freq_expression_parse(freqSet))
+
+
+def result_text_gen(query_result, shapeInfo, sql, fileName):
+    """
+    Generate the result text from the query result
+
+    :param query_result: the query result
+    :param shapeInfo: the shape information
+    :param sql: the SQL query array
+    :param fileName: the name of the result file
+    """
+
+    # check the sql witch is not empty
+    break_flag = False
+    for i in range(shapeInfo.__len__()):
+        for j in range(3):
+            if sql[i][j]:
+                raw_sql = sql[i][j]
+                text_head = []
+                for line in raw_sql.strip().split('\n'):
+                    line = line.lstrip()
+                    if line.startswith(('AND', 'OR', 'WHERE')):
+                        line = re.sub(r'(?<= )[a-z]*\.', '', line, count=1).replace('WHERE', '')
+                        text_head.append(line)
+
+                text_head = '# ' + '    '.join(text_head)
+
+                print(text_head)
+                break_flag = True
+                break
+        if break_flag:
+            break
+
+    result_path = get_cnf("conf/server.cnf", "server")["result_path"] + fileName
+    with open(result_path, "a") as f:
+        pass
