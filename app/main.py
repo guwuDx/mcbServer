@@ -54,7 +54,7 @@ class queryRequest(BaseModel):
 @app.post("/query/api/")
 def query_api(request: queryRequest):
     N_M_F = freq_range_parse(request.freqSet)
-    freqRange = ["_fir", "_mir", "_nir"]
+    freqRange = ["_nir", "_mir", "_fir"]
     conn = get_db_connection()
     shapeInfo = get_shapeInfo(conn)
     sql = [["" for _ in range(3)] for _ in range(shapeInfo.__len__())]
@@ -78,7 +78,7 @@ def query_api(request: queryRequest):
             else:
                 print(f"No data was requested for {shape.name} in {freqRange[j]}")
 
-    print(query_result[3][0][0])
+    print(query_result[3][2])
     conn.close()
     return {"message": "OK"}
 

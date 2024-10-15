@@ -194,11 +194,11 @@ def N_M_F_judge(result_intervals):
 
     for start, end in result_intervals:
         if start < M_FIR: # Overlapping with NIR: [0, M_FIR]
-            N_M_F[0] = 1
+            N_M_F[2] = 1
         if start < N_MIR < end: # Overlapping with MIR: [N_MIR, M_FIR]
             N_M_F[1] = 1
         if end > N_MIR: # Overlapping with FIR: [N_MIR, inf)
-            N_M_F[2] = 1
+            N_M_F[0] = 1
     return N_M_F
 
 
