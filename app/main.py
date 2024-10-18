@@ -1,11 +1,14 @@
 import numpy as np
 import hashlib
+import glob
+import os
 
 from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List, Optional
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import get_db_connection
 from app.db import query_generic_gen
@@ -15,9 +18,23 @@ from app.db import query_exec
 from app.units import get_shapeInfo
 from app.units import freq_range_parse
 from app.units import result_text_gen
+from app.units import get_cnf
 
 
 app = FastAPI()
+
+origins = [
+    "http://localhost", # for development
+    "http://127.0.0.1", # for development
+]
+
+app.add_middleware(
+    CORSMiddleware, # Cross-Origin Resource Sharing
+    allow_origins=["*"],  # allow all origins
+    allow_credentials=True, # allow credentials
+    allow_methods=["*"],  # allow all methods
+    allow_headers=["*"],  # allow all headers
+)
 
 class Shape(BaseModel):
     id: int
@@ -56,9 +73,9 @@ class queryRequest(BaseModel):
 
 @app.post("/query/api/")
 def query_api(request: queryRequest):
+    now = datetime.now()
     fid = (hashlib.sha256(request.model_dump_json().encode('utf-8')))
     fid = fid.hexdigest()
-    now = datetime.now()
     fileName = f"{fid}{now.strftime('%Y%m%d%H%M%S')}.txt"
 
     N_M_F = freq_range_parse(request.freqSet)
@@ -92,10 +109,49 @@ def query_api(request: queryRequest):
                     query_result[shape.id] = np.vstack((query_result[shape.id], query_result_tmp))
             else:
                 print(f"[INFO][mcbq] No data was requested for {shape.name} about {freqRange[j]}")
-
     conn.close()
+
+    # check if the query result is empty at all
+    for i, arr in enumerate(query_result):
+        if len(arr) != 0:
+            break
+        else:
+            i = shapeInfo.__len__() - 1
+    if i == shapeInfo.__len__() - 1 and len(arr) == 0:
+        return {"status":4, "message": "[WARN][mcbq] No data was found in the database"}
 
     delivered_file = result_text_gen(query_result, shapeInfo, sql, fileName)
 
-    return {"message": "[OK][mcbq] Query was successful", "file": delivered_file}
+    # block the download if the file larger than 1GB
+    if os.path.getsize(delivered_file) > 1024*1024*1024:
+        return {"status":3, "message": "[WARN][mcbq] The file is too large to download"}
 
+    return {"status":0, "message": "[OK][mcbq] Query was successful", "file": fileName[:64]}
+
+
+
+@app.get("/query/download/")
+async def download_file(file: str):
+    now = datetime.now()
+    time = now.strftime('%Y%m%d%H%M%S')
+    if not len(file) == 64:
+        return {"status":2, "message": "[ERROR][mcbq] illegal file name"}
+
+    result_dir = get_cnf("conf/server.cnf", "server")["result_path"]
+    if result_dir[-1] != '/' or result_dir[-1] != '\\':
+        result_dir += '/'
+    if not os.path.exists(result_dir):
+        return {"status":1, "message": "[ERROR][mcbq] Server Internal Error"}
+
+    pattern = os.path.join(result_dir, file + '*')
+    matching_files = glob.glob(pattern)
+    filtered_files = [f for f in matching_files if os.path.basename(f)[:64] == file]
+
+    # return the latest file, file name is time
+    if filtered_files:
+        return FileResponse(filtered_files[-1], 
+                            media_type='text/plain', 
+                            filename=f"mcbq_{time}.txt",
+                            headers={"Content-Disposition": f"attachment; filename={time}.txt"})
+    else:
+        return {"status":1, "message": "[ERROR][mcbq] Server Internal Error"}
