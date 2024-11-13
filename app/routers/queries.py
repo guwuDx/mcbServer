@@ -4,7 +4,7 @@ import glob
 import os
 
 from datetime import datetime
-from fastapi import FastAPI, HTTPException, APIRouter
+from fastapi import APIRouter
 from fastapi.responses import FileResponse
 
 from app.db import get_db_connection
@@ -29,6 +29,8 @@ def query_api(request: queryRequest):
     fileName = f"{fid}{now.strftime('%Y%m%d%H%M%S')}.txt"
 
     N_M_F = freq_range_parse(request.freqSet)
+    if N_M_F == [False, False, False]:
+        N_M_F = [True, True, True]
     freqRange = ["_nir", "_mir", "_fir"]
     conn = get_db_connection()
     shapeInfo = get_shapeInfo(conn)
