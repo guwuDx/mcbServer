@@ -1,6 +1,5 @@
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
-from fastapi_jwt_auth import AuthJWT
 
 ## Query API ####################################
 class Shape(BaseModel):
@@ -54,7 +53,7 @@ class userOut(BaseModel): # User output & profile
 
 ##
 class settings(BaseModel): # Settings of the jwt
-    authjwt_secret_key: str
+    authjwt_secret_key: str = "secret"  # for development, set a random string for production
     authjwt_token_location: set = {"cookies"}
     authjwt_cookie_secure: bool = False # for development, set True for production
     authjwt_cookie_samesite: str = "lax"
