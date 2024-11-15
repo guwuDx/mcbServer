@@ -36,7 +36,7 @@ class queryRequest(BaseModel):
     freqSet: List[Freq]
 
 
-## User API ####################################
+## Users API ####################################
 class userCreate(BaseModel): # User registration
     username: str
     email: EmailStr
@@ -49,9 +49,13 @@ class userLogin(BaseModel): # User login
 class userOut(BaseModel): # User output & profile
     username: str
     email: EmailStr
+    coins: int
+
+    class Config:
+        orm_mode = True
 
 
-##
+## JWT Settings ####################################
 class settings(BaseModel): # Settings of the jwt
     authjwt_secret_key: str = "secret"  # for development, set a random string for production
     authjwt_token_location: set = {"cookies"}

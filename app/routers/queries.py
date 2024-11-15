@@ -7,15 +7,15 @@ from datetime import datetime
 from fastapi import APIRouter
 from fastapi.responses import FileResponse
 
-from app.db import get_db_connection
-from app.db import query_generic_gen
-from app.db import query_freq_gen
-from app.db import query_cat
-from app.db import query_exec
-from app.units import get_shapeInfo
-from app.units import freq_range_parse
-from app.units import result_text_gen
-from app.units import get_cnf
+from app.utils.db import get_db_connection
+from app.utils.db import query_generic_gen
+from app.utils.db import query_freq_gen
+from app.utils.db import query_cat
+from app.utils.db import query_exec
+from app.utils.queries import get_shapeInfo
+from app.utils.queries import freq_range_parse
+from app.utils.queries import result_text_gen
+from app.utils.queries import get_cnf
 
 from app.schemas import queryRequest
 
@@ -32,7 +32,7 @@ def query_api(request: queryRequest):
     if N_M_F == [False, False, False]:
         N_M_F = [True, True, True]
     freqRange = ["_nir", "_mir", "_fir"]
-    conn = get_db_connection()
+    conn = get_db_connection("db_official")
     shapeInfo = get_shapeInfo(conn)
     sql = [["" for _ in range(3)] for _ in range(shapeInfo.__len__())]
     query_result = [[] for _ in range(shapeInfo.__len__())]

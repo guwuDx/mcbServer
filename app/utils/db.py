@@ -1,9 +1,9 @@
 import mysql.connector
-from app.units import get_cnf
+from app.utils.general import get_cnf
 
 
-def get_db_connection():
-    db_config = get_cnf("conf/server.cnf", "database")
+def get_db_connection(database: str):
+    db_config = get_cnf("conf/server.cnf", database)
 
     if db_config["base"] == "mysql":
         pass
